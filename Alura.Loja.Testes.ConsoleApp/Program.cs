@@ -15,6 +15,11 @@ namespace Alura.Loja.Testes.ConsoleApp
   {
     static void Main(string[] args)
     {
+     
+    }
+
+    private static void ExplicaoChangeTracker()
+    {
       using (var contexto = new LojaContext())
       {
         var serviceProvider = contexto.GetInfrastructure<IServiceProvider>();
@@ -101,6 +106,7 @@ namespace Alura.Loja.Testes.ConsoleApp
 
     private static void GravarUsandoEntity()
     {
+      /*
       Produto p1 = new Produto();
       p1.Nome = "O Carteiro e o Poeta";
       p1.Categoria = "Livros";
@@ -123,11 +129,12 @@ namespace Alura.Loja.Testes.ConsoleApp
         contexto.Adicionar(p2);
         contexto.Adicionar(p3);
       }
+      */
     }
 
     private static void GravarUsandoAdoNet()
     {
-      Produto p = new Produto();
+      /*Produto p = new Produto();
       p.Nome = "Harry Potter e a Ordem da Fênix";
       p.Categoria = "Livros";
       p.Preco = 19.89;
@@ -136,6 +143,7 @@ namespace Alura.Loja.Testes.ConsoleApp
       {
         repo.Adicionar(p);
       }
+      */
     }
   }
 }
