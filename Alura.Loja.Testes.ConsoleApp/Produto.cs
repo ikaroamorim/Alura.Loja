@@ -10,7 +10,7 @@
 
     public override string ToString()
     {
-      return $"Id: {Id} \tNome: {Nome} \tCategoria: {Categoria} \tPreço: {Preco}";
+      return $"Id: {Id} \tNome: {Nome} \t\tCategoria: {Categoria} \tPreço: {Preco}";
     }
   }
 }

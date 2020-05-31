@@ -1,6 +1,11 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,36 +17,50 @@ namespace Alura.Loja.Testes.ConsoleApp
     {
       using (var contexto = new LojaContext())
       {
+        var serviceProvider = contexto.GetInfrastructure<IServiceProvider>();
+        var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+        loggerFactory.AddProvider(SqlLoggerProvider.Create());
+
         var produtos = contexto.Produtos.ToList();
-        foreach (var item in produtos)
-        {
-          Console.WriteLine(item);
-        }
 
-        Console.WriteLine("++++++++++++++++++++++");
+        Exibeentries(contexto.ChangeTracker.Entries());
 
-        foreach (var item in contexto.ChangeTracker.Entries())
-        {
-          Console.WriteLine(item.State);
-        }
         Console.WriteLine("++++++++++++++++++++++\nModificando\n++++++++++++++++++++++");
 
-        var p1 = produtos.First();
-        p1.Nome = "Harry poter";
+        //Alteração de um produto
+        //var p1 = produtos.First();
+        //p1.Nome = "Harry poter e a Ordem da Fenix";
 
-        foreach (var item in contexto.ChangeTracker.Entries())
-        {
-          Console.WriteLine(item.State);
-        }
+        //Inclusão de novo Produto
+        //var novoProduto = new Produto()
+        //{
+        //  Nome = "Desinfetante",
+        //  Categoria = "Limpeza",
+        //  Preco = 2.99
+        //};
+        //contexto.Produtos.Add(novoProduto);
 
-        Console.WriteLine("++++++++++++++++++++++");
+        //Exclusão de produto
+        var p1 = produtos.Last();
+        contexto.Produtos.Remove(p1);
 
-        produtos = contexto.Produtos.ToList();
-        foreach (var item in produtos)
-        {
-          Console.WriteLine(item);
-        }
+        Exibeentries(contexto.ChangeTracker.Entries());
+
+        contexto.SaveChanges();
+
+        Exibeentries(contexto.ChangeTracker.Entries());
       }
+    }
+
+    private static void Exibeentries(IEnumerable<EntityEntry> entries)
+    {
+      Console.WriteLine("++++++++++++++++++++++");
+
+      foreach (var item in entries)
+      {
+        Console.WriteLine(item.Entity.ToString() + " - " + item.State);
+      }
+
     }
 
     private static void AtualizarProduto()
@@ -57,7 +76,7 @@ namespace Alura.Loja.Testes.ConsoleApp
 
     private static void ExcluirProdutos()
     {
-      using(var repo = new ProdutoDAOEntity())
+      using (var repo = new ProdutoDAOEntity())
       {
         IList<Produto> produtos = repo.Produtos();
         foreach (var item in produtos)
