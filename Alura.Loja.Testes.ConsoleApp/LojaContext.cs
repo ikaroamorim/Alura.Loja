@@ -6,6 +6,7 @@ namespace Alura.Loja.Testes.ConsoleApp
   internal class LojaContext : DbContext, IDisposable
   {
     public DbSet<Produto> Produtos { get; set; } //Nome da tabela do banco de dados
+    public DbSet<Compra> Compras { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

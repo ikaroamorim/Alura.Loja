@@ -15,7 +15,31 @@ namespace Alura.Loja.Testes.ConsoleApp
   {
     static void Main(string[] args)
     {
-     
+      var paoFrances = new Produto()
+      {
+        Nome = "Pão Frances",
+        PrecoUnitario = 0.40,
+        Unidade = "Unidade",
+        Categoria = "Padaria"
+      };
+
+      var compra = new Compra();
+      compra.Quantidade = 6;
+      compra.Produto = paoFrances;
+      compra.Preco = paoFrances.PrecoUnitario * compra.Quantidade;
+
+      using (var contexto = new LojaContext())
+      {
+        var serviceProvider = contexto.GetInfrastructure<IServiceProvider>();
+        var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+        loggerFactory.AddProvider(SqlLoggerProvider.Create());
+
+        contexto.Compras.Add(compra);
+        Exibeentries(contexto.ChangeTracker.Entries());
+
+        contexto.SaveChanges();
+      }
+
     }
 
     private static void ExplicaoChangeTracker()
