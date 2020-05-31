@@ -10,6 +10,7 @@ namespace Alura.Loja.Testes.ConsoleApp
   class ProdutoDAOEntity : IProdutoDAO, IDisposable
   {
     private LojaContext contexto;
+    //private<Produto> Produtos
 
     public ProdutoDAOEntity()
     {

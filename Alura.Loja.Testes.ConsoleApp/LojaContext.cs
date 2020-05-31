@@ -3,7 +3,7 @@ using System;
 
 namespace Alura.Loja.Testes.ConsoleApp
 {
-  internal class LojaContext : DbContext
+  internal class LojaContext : DbContext, IDisposable
   {
     public DbSet<Produto> Produtos { get; set; } //Nome da tabela do banco de dados
 

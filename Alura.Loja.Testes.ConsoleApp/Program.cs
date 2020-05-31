@@ -10,44 +10,68 @@ namespace Alura.Loja.Testes.ConsoleApp
   {
     static void Main(string[] args)
     {
-      //GravarUsandoAdoNet();
-      GravarUsandoEntity();
-      RecuperarProdutos();
-      //ExcluirProdutos();
-      //RecuperarProdutos();
-      AtualizarProduto();
-      RecuperarProdutos();
+      using (var contexto = new LojaContext())
+      {
+        var produtos = contexto.Produtos.ToList();
+        foreach (var item in produtos)
+        {
+          Console.WriteLine(item);
+        }
+
+        Console.WriteLine("++++++++++++++++++++++");
+
+        foreach (var item in contexto.ChangeTracker.Entries())
+        {
+          Console.WriteLine(item.State);
+        }
+        Console.WriteLine("++++++++++++++++++++++\nModificando\n++++++++++++++++++++++");
+
+        var p1 = produtos.First();
+        p1.Nome = "Harry poter";
+
+        foreach (var item in contexto.ChangeTracker.Entries())
+        {
+          Console.WriteLine(item.State);
+        }
+
+        Console.WriteLine("++++++++++++++++++++++");
+
+        produtos = contexto.Produtos.ToList();
+        foreach (var item in produtos)
+        {
+          Console.WriteLine(item);
+        }
+      }
     }
 
     private static void AtualizarProduto()
     {
 
-      using (var repo = new LojaContext())
+      using (var repo = new ProdutoDAOEntity())
       {
-        Produto primeiro = repo.Produtos.First();
+        var primeiro = repo.Produtos().First();
         primeiro.Nome = "Cassino Royale - Editado";
-        repo.SaveChanges();
+        repo.Atualizar(primeiro);
       }
     }
 
     private static void ExcluirProdutos()
     {
-      using(var repo = new LojaContext())
+      using(var repo = new ProdutoDAOEntity())
       {
-        IList<Produto> produtos = repo.Produtos.ToList();
+        IList<Produto> produtos = repo.Produtos();
         foreach (var item in produtos)
         {
-          repo.Produtos.Remove(item);
+          repo.Remover(item);
         }
-        repo.SaveChanges();
       }
     }
 
     private static void RecuperarProdutos()
     {
-      using (var repo = new LojaContext())
+      using (var repo = new ProdutoDAOEntity())
       {
-        IList<Produto> produtos = repo.Produtos.ToList();
+        IList<Produto> produtos = repo.Produtos();
         Console.WriteLine($"Foram encontrados: {produtos.Count} produtos");
         foreach (var item in produtos)
         {
@@ -73,13 +97,12 @@ namespace Alura.Loja.Testes.ConsoleApp
       p3.Categoria = "Livros";
       p3.Preco = 25.49;
 
-      using (var contexto = new LojaContext())
+      using (var contexto = new ProdutoDAOEntity())
       {
-        //contexto.Produtos.Add(p1);
-        //contexto.Produtos.Add(p2);
-        //contexto.Produtos.Add(p3);
-        contexto.AddRange(p1, p2, p3);
-        contexto.SaveChanges();
+        //contexto.Adicionar(p1, p2, p3);
+        contexto.Adicionar(p1);
+        contexto.Adicionar(p2);
+        contexto.Adicionar(p3);
       }
     }
 
