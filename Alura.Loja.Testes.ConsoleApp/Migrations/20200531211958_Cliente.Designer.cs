@@ -4,14 +4,16 @@ using Alura.Loja.Testes.ConsoleApp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Alura.Loja.Testes.ConsoleApp.Migrations
 {
     [DbContext(typeof(LojaContext))]
-    partial class LojaContextModelSnapshot : ModelSnapshot
+    [Migration("20200531211958_Cliente")]
+    partial class Cliente
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

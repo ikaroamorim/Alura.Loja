@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -15,9 +16,106 @@ namespace Alura.Loja.Testes.ConsoleApp
   {
     static void Main(string[] args)
     {
-      var p1 = new Produto() { Nome = "Suco de Laranja", Categoria = "Bebidas", PrecoUnitario = 8.7, Unidade= "Litros" };
-      var p2 = new Produto() { Nome = "Café", Categoria = "Bebidas", PrecoUnitario = 11.7, Unidade= "Kilo" };
-      var p3 = new Produto() { Nome = "Macarrão", Categoria = "Alimento", PrecoUnitario = 3.47, Unidade= "Pacote" };
+      using (var contexto = new LojaContext())
+      {
+        var serviceProvider = contexto.GetInfrastructure<IServiceProvider>();
+        var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+        loggerFactory.AddProvider(SqlLoggerProvider.Create());
+
+        var cliente = contexto
+          .Clientes
+          .Include(c => c.EnderecoEntrega)
+          .FirstOrDefault();
+
+        var produto = contexto
+          .Produtos
+          .Include(p => p.Compras)
+          .Where(p => p.Id == 9004)
+          .FirstOrDefault();
+
+        //Console.WriteLine("Mostrando as compras do"+ produto.Nome);
+        foreach (var item in produto.Compras)
+        {
+          Console.WriteLine(item);
+        }
+
+        Console.WriteLine($"Endereço de Entrega: {cliente.EnderecoEntrega.Logradouro}");
+      }
+    }
+
+    private static void ExibeProdutosPromo()
+    {
+      using (var contexto2 = new LojaContext())
+      {
+        var serviceProvider = contexto2.GetInfrastructure<IServiceProvider>();
+        var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+        loggerFactory.AddProvider(SqlLoggerProvider.Create());
+
+        var promocao = contexto2
+          .Promocoes
+          .Include(p => p.Produtos)
+          .ThenInclude(pp => pp.Produto)
+          .FirstOrDefault();
+
+        Console.WriteLine("\nMostrando os produtos da promoção...");
+
+        foreach (var item in promocao.Produtos)
+        {
+          Console.WriteLine(item.Produto);
+        }
+      }
+    }
+
+    private static void IncluirPromocao()
+    {
+      using (var contexto = new LojaContext())
+      {
+        var promocao = new Promocao();
+        promocao.Descricao = "Queima total Jan/2017";
+        promocao.DataInicio = new DateTime(2020, 05, 31);
+        promocao.DataTermino = new DateTime(2020, 08, 31);
+
+        var produtos = contexto.Produtos.Where(p => p.Categoria == "Bebidas").ToList();
+
+        foreach (var item in produtos)
+        {
+          promocao.IncluiProduto(item);
+        }
+
+        contexto.Promocoes.Add(promocao);
+
+        Exibeentries(contexto.ChangeTracker.Entries());
+
+        contexto.SaveChanges();
+      }
+    }
+
+    private static void UmPraUm()
+    {
+      var fulano = new Cliente();
+      fulano.Nome = "Fulano Silva";
+
+      fulano.EnderecoEntrega = new Endereco()
+      {
+        Logradouro = "Rua dos Inválidos",
+        Numero = 12,
+        Complemento = "Sobrado",
+        Bairro = "Centro",
+        Cidade = "São Paulo"
+      };
+
+      using (var contexto = new LojaContext())
+      {
+        contexto.Clientes.Add(fulano);
+        contexto.SaveChanges();
+      }
+    }
+
+    private static void UmMuitosEMuitosMuitos()
+    {
+      var p1 = new Produto() { Nome = "Suco de Laranja", Categoria = "Bebidas", PrecoUnitario = 8.7, Unidade = "Litros" };
+      var p2 = new Produto() { Nome = "Café", Categoria = "Bebidas", PrecoUnitario = 11.7, Unidade = "Kilo" };
+      var p3 = new Produto() { Nome = "Macarrão", Categoria = "Alimento", PrecoUnitario = 3.47, Unidade = "Pacote" };
       var promocaoPascoa = new Promocao();
       promocaoPascoa.Descricao = "Páscoa Feliz";
       promocaoPascoa.DataInicio = DateTime.Now;
@@ -43,7 +141,7 @@ namespace Alura.Loja.Testes.ConsoleApp
 
       }
 
-      /*
+
       var paoFrances = new Produto()
       {
         Nome = "Pão Frances",
@@ -68,7 +166,6 @@ namespace Alura.Loja.Testes.ConsoleApp
 
         contexto.SaveChanges();
       }
-      */
     }
 
     private static void ExplicaoChangeTracker()

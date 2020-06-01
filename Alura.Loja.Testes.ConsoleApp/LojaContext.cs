@@ -8,12 +8,28 @@ namespace Alura.Loja.Testes.ConsoleApp
     public DbSet<Produto> Produtos { get; set; } //Nome da tabela do banco de dados
     public DbSet<Compra> Compras { get; set; }
     public DbSet<Promocao> Promocoes { get; set; }
+    public DbSet<Cliente> Clientes { get; set; }
+    public DbSet<Endereco> Enderecos { get; set; } //Ess propriedade é opcional pois ao mapear clientes ele cria a tabela correspondente
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       modelBuilder
         .Entity<PromocaoProduto>()
         .HasKey(pp => new { pp.PromocaoId, pp.ProdutoId });
+
+      modelBuilder
+        .Entity<Endereco>()
+        .Property<int>("ClienteId");
+
+      modelBuilder
+        .Entity<Endereco>()
+        .HasKey("ClienteId");
+
+      /*  ---- Seria necessário se não tivessemos criado a prop, pois mapearia a tabela errado
+      modelBuilder
+        .Entity<Endereco>()
+        .ToTable("Enderecos");
+      */
       base.OnModelCreating(modelBuilder);
     }
 
